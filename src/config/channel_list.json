@@ -1,0 +1,16 @@
+[
+    {
+        "Id": 0,
+        "Name": "Wally Seck Officiel",
+        "Link": "https://www.youtube.com/@officielwallyseck",
+        "Keep_Days": 30,
+        "DL_Days": 30,
+        "Last_Synced": "15-05-26 23:07:01",
+        "Item_Count": 0,
+        "Filter_Title_Text": "",
+        "Negate_Filter": false,
+        "Media_Type": "Video",
+        "Search_Limit": "",
+        "Live_Rule": "Ignore"
+    }
+]
