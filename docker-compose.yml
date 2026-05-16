@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  channeltube:
+    build: .
+    container_name: channeltube
+    restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      - /root/channeltube/video:/app/downloads
+      - /root/channeltube/config:/app/config
+``
