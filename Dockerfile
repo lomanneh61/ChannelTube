@@ -29,4 +29,3 @@ RUN chmod +x thewicklowwolf-init.sh
 EXPOSE 5000
 
 ENTRYPOINT ["./thewicklowwolf-init.sh"]
-
