@@ -13,14 +13,18 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# ✅ map gosu → su-exec (fix)
+# map gosu → su-exec
 RUN ln -s /usr/bin/gosu /usr/local/bin/su-exec
 
 COPY . /channeltube
 WORKDIR /channeltube
 
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install --no-cache-dir \
+    --default-timeout=100 \
+    --retries 10 \
+    -r requirements.txt
 
 RUN chmod +x thewicklowwolf-init.sh
 
