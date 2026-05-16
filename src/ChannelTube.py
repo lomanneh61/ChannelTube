@@ -460,19 +460,36 @@ class DataHandler:
 
                 filename = f"s{year}.e{video_id} - {safe_title}"
 
+                
                 ydl_opts = {
                     "paths": {"home": season_path, "temp": temp_dir.name},
                     "logger": self.general_logger,
                     "ffmpeg_location": "/usr/bin/ffmpeg",
                     "format": selected_format,
-                    
+
                     "outtmpl": f"{filename}.%(ext)s",
                     "quiet": True,
                     "writethumbnail": True,
+
+                   # ✅ network fixes
+                   "retries": 10,
+                   "fragment_retries": 10,
+                    "socket_timeout": 60,
+                    "concurrent_fragment_downloads": 1,
+
+                   # ✅ merged extractor args (FIXED)
+                   "extractor_args": {
+                        "youtube": {
+                            "player_client": ["android"]
+                        },
+                        "youtubetab": {
+                            "skip": ["authcheck"]
+                        }
+                    },
+
                     "postprocessors": post_processors,
                     "no_mtime": True,
                     "live_from_start": True,
-                    "extractor_args": {"youtubetab": {"skip": ["authcheck"]}},
                     "verbose": self.verbose_logs,
                 }
 
