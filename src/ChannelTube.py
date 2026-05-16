@@ -398,6 +398,13 @@ class DataHandler:
             try:
                 temp_dir = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
                 link = item["link"]
+                # ✅ Season folder by year
+                upload_date = item["upload_date"]
+                year = upload_date.strftime("%Y")
+
+                season_folder = f"Season {year}"
+                season_path = os.path.join(channel_folder_path, season_folder)
+                os.makedirs(season_path, exist_ok=True)
                 cleaned_title = self.string_cleaner(item["title"])
                 selected_media_type = channel["Media_Type"]
                 post_processors = [
@@ -431,11 +438,16 @@ class DataHandler:
 
                 folder_and_filename = os.path.join(channel_folder_path, cleaned_title)
                 ydl_opts = {
-                    "paths": {"home": channel_folder_path, "temp": temp_dir.name},
+                    "paths": {"home": season_path, "temp": temp_dir.name},
                     "logger": self.general_logger,
                     "ffmpeg_location": "/usr/bin/ffmpeg",
                     "format": selected_format,
-                    "outtmpl": f"{cleaned_title}.%(ext)s",
+                    safe_title = self.string_cleaner(item["title"])
+                    video_id = item["id"]
+
+                    filename = f"s{year}.e{video_id} - {safe_title}"
+
+                    "outtmpl": f"{filename}.%(ext)s",
                     "quiet": True,
                     "writethumbnail": True,
                     "progress_hooks": [self.progress_callback],
