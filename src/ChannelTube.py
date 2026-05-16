@@ -429,22 +429,38 @@ class DataHandler:
                     ]
                 )
 
-                folder_and_filename = os.path.join(channel_folder_path, cleaned_title)
-                ydl_opts = {
-                    "paths": {"home": channel_folder_path, "temp": temp_dir.name},
-                    "logger": self.general_logger,
-                    "ffmpeg_location": "/usr/bin/ffmpeg",
-                    "format": selected_format,
-                    "outtmpl": f"{cleaned_title}.%(ext)s",
-                    "quiet": True,
-                    "writethumbnail": True,
-                    "progress_hooks": [self.progress_callback],
-                    "postprocessors": post_processors,
-                    "no_mtime": True,
-                    "live_from_start": True,
-                    "extractor_args": {"youtubetab": {"skip": ["authcheck"]}},
-                    "verbose": self.verbose_logs,
-                }
+# ✅ Build TV-style folder (Season by year)
+upload_date = item["upload_date"]
+year = upload_date.strftime("%Y")
+
+season_folder = f"Season {year}"
+season_path = os.path.join(channel_folder_path, season_folder)
+os.makedirs(season_path, exist_ok=True)
+
+# ✅ Build episode-style filename
+episode_id = item["id"]
+safe_title = self.string_cleaner(item["title"])
+
+filename = f"s{year}.e{episode_id} - {safe_title}"
+
+ydl_opts = {
+    "paths": {"home": season_path, "temp": temp_dir.name},
+    "logger": self.general_logger,
+    "ffmpeg_location": "/usr/bin/ffmpeg",
+    "format": selected_format,
+
+    "outtmpl": f"{filename}.%(ext)s",
+
+    "quiet": True,
+    "writethumbnail": True,
+    "progress_hooks": [self.progress_callback],
+    "postprocessors": post_processors,
+    "no_mtime": True,
+    "live_from_start": True,
+    "extractor_args": {"youtubetab": {"skip": ["authcheck"]}},
+    "verbose": self.verbose_logs,
+}
+
 
                 if self.subtitles in ["embed", "external"]:
                     ydl_opts.update(
