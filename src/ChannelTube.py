@@ -287,7 +287,16 @@ class DataHandler:
     def get_list_of_files_from_channel_folder(self, channel_folder_path):
         try:
             folder_info = {"id_list": [], "filename_list": []}
-            raw_directory_list = os.listdir(channel_folder_path)
+            for root, dirs, files in os.walk(channel_folder_path):
+                for filename in files:
+                    file_path = os.path.join(root, filename)
+
+                    file_base_name, file_ext = os.path.splitext(filename.lower())
+                    if file_ext in VIDEO_EXTENSIONS:
+                        video_item_count += 1
+                    elif file_ext in AUDIO_EXTENSIONS:
+                         audio_item_count += 1
+
             for filename in raw_directory_list:
                 file_path = os.path.join(channel_folder_path, filename)
                 if not os.path.isfile(file_path):
@@ -341,7 +350,9 @@ class DataHandler:
             return
 
         current_datetime = datetime.datetime.now()
-        raw_directory_list = os.listdir(channel_folder_path)
+        for root, dirs, files in os.walk(channel_folder_path):
+            for filename in files:
+                file_path = os.path.join(root, filename)
         for filename in raw_directory_list:
             try:
                 file_path = os.path.join(channel_folder_path, filename)
@@ -490,7 +501,9 @@ class DataHandler:
                 yt_downloader.download([link])
                 self.general_logger.warning(f"yt_dlp -> Finished: {link}")
 
-                self.add_extra_metadata(f"{folder_and_filename}.{selected_ext}", item)
+                full_file_path = os.path.join(season_path, f"{filename}.{selected_ext}")
+                self.add_extra_metadata(full_file_path, item)
+
 
             except Exception as e:
                 self.general_logger.error(f"Error downloading video: {link}. Error message: {e}")
