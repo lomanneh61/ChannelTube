@@ -284,42 +284,44 @@ class DataHandler:
 
         return video_to_download_list
 
-    def get_list_of_files_from_channel_folder(self, channel_folder_path):
-        try:
-            folder_info = {"id_list": [], "filename_list": []}
-            for root, dirs, files in os.walk(channel_folder_path):
-                for filename in files:
-                    file_path = os.path.join(root, filename)
+def get_list_of_files_from_channel_folder(self, channel_folder_path):
+    try:
+        folder_info = {"id_list": [], "filename_list": []}
 
-                    file_base_name, file_ext = os.path.splitext(filename.lower())
-                    if file_ext in VIDEO_EXTENSIONS:
-                        video_item_count += 1
-                    elif file_ext in AUDIO_EXTENSIONS:
-                         audio_item_count += 1
+        for root, dirs, files in os.walk(channel_folder_path):
+            for filename in files:
+                file_path = os.path.join(root, filename)
 
-            for filename in raw_directory_list:
-                file_path = os.path.join(channel_folder_path, filename)
                 if not os.path.isfile(file_path):
                     continue
 
                 try:
                     file_base_name, file_ext = os.path.splitext(filename)
+
                     if file_ext.lower() in MEDIA_FILE_EXTENSIONS:
                         folder_info["filename_list"].append(file_base_name)
+
                         mp4_file = MP4(file_path)
                         embedded_video_id = mp4_file.get("\xa9cmt", [None])[0]
+
                         folder_info["id_list"].append(embedded_video_id)
 
                 except Exception as e:
-                    self.general_logger.error(f"No video ID present or cannot read it from metadata of {filename}: {e}")
+                    self.general_logger.error(
+                        f"No video ID present or cannot read metadata from {filename}: {e}"
+                    )
 
-        except Exception as e:
-            self.general_logger.error(f"Error getting list of files for channel folder: {e}")
+    except Exception as e:
+        self.general_logger.error(
+            f"Error getting list of files for channel folder: {e}"
+        )
 
-        finally:
-            self.general_logger.warning(f'Found {len(folder_info["filename_list"])} files and {len(folder_info["id_list"])} IDs in {channel_folder_path}.')
-        
-        return folder_info
+    finally:
+        self.general_logger.warning(
+            f'Found {len(folder_info["filename_list"])} files and {len(folder_info["id_list"])} IDs in {channel_folder_path}.'
+        )
+
+    return folder_info
 
     def count_media_files(self, channel_folder_path):
     video_item_count = 0
