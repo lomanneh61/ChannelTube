@@ -96,4 +96,4 @@ fi
 
 # Start the application with the specified user permissions
 echo "Running ChannelTube..."
-exec su-exec ${PUID}:${PGID} gunicorn src.ChannelTube:app -c gunicorn_config.py
+exec python src/ChannelTube.py

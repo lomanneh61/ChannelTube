@@ -322,40 +322,43 @@ class DataHandler:
         return folder_info
 
     def count_media_files(self, channel_folder_path):
-        video_item_count = 0
-        audio_item_count = 0
+    video_item_count = 0
+    audio_item_count = 0
 
-        raw_directory_list = os.listdir(channel_folder_path)
-        for filename in raw_directory_list:
-            file_path = os.path.join(channel_folder_path, filename)
-            if not os.path.isfile(file_path):
-                continue
+    for root, dirs, files in os.walk(channel_folder_path):
+        for filename in files:
+            file_path = os.path.join(root, filename)
 
             file_base_name, file_ext = os.path.splitext(filename.lower())
+
             if file_ext in VIDEO_EXTENSIONS:
                 video_item_count += 1
             elif file_ext in AUDIO_EXTENSIONS:
                 audio_item_count += 1
 
-        self.general_logger.info(f"Found {video_item_count} video files and {audio_item_count} audio files in {channel_folder_path}.")
+    self.general_logger.info(
+        f"Found {video_item_count} video files and {audio_item_count} audio files in {channel_folder_path}."
+    )
 
-        return video_item_count + audio_item_count
+       return video_item_count + audio_item_count
 
-    def cleanup_old_files(self, channel_folder_path, channel):
-        days_to_keep = channel["Keep_Days"]
-        selected_media_type = channel["Media_Type"]
+def cleanup_old_files(self, channel_folder_path, channel):
+    days_to_keep = channel["Keep_Days"]
+    selected_media_type = channel["Media_Type"]
 
-        if days_to_keep == PERMANENT_RETENTION:
-            self.general_logger.warning(f"Skipping cleanup for channel: {channel['Name']} due to permanent retention policy.")
-            return
+    if days_to_keep == PERMANENT_RETENTION:
+        self.general_logger.warning(
+            f"Skipping cleanup for channel: {channel['Name']} due to permanent retention policy."
+        )
+        return
 
-        current_datetime = datetime.datetime.now()
-        for root, dirs, files in os.walk(channel_folder_path):
-            for filename in files:
-                file_path = os.path.join(root, filename)
-        for filename in raw_directory_list:
+    current_datetime = datetime.datetime.now()
+
+    for root, dirs, files in os.walk(channel_folder_path):
+        for filename in files:
             try:
-                file_path = os.path.join(channel_folder_path, filename)
+                file_path = os.path.join(root, filename)
+
                 if not os.path.isfile(file_path):
                     continue
 
@@ -373,13 +376,19 @@ class DataHandler:
 
                 if age > datetime.timedelta(days=days_to_keep):
                     os.remove(file_path)
-                    self.general_logger.warning(f"Deleted: {filename} as it is {age.days} days old.")
+                    self.general_logger.warning(
+                        f"Deleted: {file_path} as it is {age.days} days old."
+                    )
                     self.media_server_scan_req_flag = True
                 else:
-                    self.general_logger.warning(f"File: {filename} is {age.days} days old, keeping file as not over {days_to_keep} days.")
+                    self.general_logger.info(
+                        f"File: {file_path} is {age.days} days old, keeping file."
+                    )
 
             except Exception as e:
-                self.general_logger.error(f"Error Cleaning Old Files: {filename} {str(e)}")
+                self.general_logger.error(
+                    f"Error Cleaning Old Files: {filename} {str(e)}"
+                )
 
     def get_file_modification_time(self, file_path, filename, file_ext):
         try:
