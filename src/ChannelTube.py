@@ -473,10 +473,10 @@ class DataHandler:
 
                 
                 ydl_opts = {
-                    "paths": {"home": season_path, "temp": temp_dir.name},
+                    "paths": {"home": season_path},
                     "logger": self.general_logger,
                     "ffmpeg_location": "/usr/bin/ffmpeg",
-                    "format": selected_format,
+                    "format": "bv*+ba/best",
 
                     "outtmpl": f"{filename}.%(ext)s",
                     "quiet": True,
@@ -491,7 +491,7 @@ class DataHandler:
                    # ✅ merged extractor args (FIXED)
                    "extractor_args": {
                         "youtube": {
-                            "player_client": ["android"]
+                            "player_client": ["web"]
                         },
                         "youtubetab": {
                             "skip": ["authcheck"]
