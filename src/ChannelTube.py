@@ -340,9 +340,9 @@ def get_list_of_files_from_channel_folder(self, channel_folder_path):
 
         self.general_logger.info(
             f"Found {video_item_count} video files and {audio_item_count} audio files in {channel_folder_path}."
-        )
+            )
 
-           return video_item_count + audio_item_count
+            return video_item_count + audio_item_count
 
 def cleanup_old_files(self, channel_folder_path, channel):
     days_to_keep = channel["Keep_Days"]
