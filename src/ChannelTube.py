@@ -284,44 +284,44 @@ class DataHandler:
 
         return video_to_download_list
 
-def get_list_of_files_from_channel_folder(self, channel_folder_path):
-    try:
-        folder_info = {"id_list": [], "filename_list": []}
+    def get_list_of_files_from_channel_folder(self, channel_folder_path):
+        try:
+            folder_info = {"id_list": [], "filename_list": []}
 
-        for root, dirs, files in os.walk(channel_folder_path):
-            for filename in files:
-                file_path = os.path.join(root, filename)
+            for root, dirs, files in os.walk(channel_folder_path):
+                for filename in files:
+                    file_path = os.path.join(root, filename)
 
-                if not os.path.isfile(file_path):
-                    continue
+                    if not os.path.isfile(file_path):
+                        continue
 
-                try:
-                    file_base_name, file_ext = os.path.splitext(filename)
+                    try:
+                        file_base_name, file_ext = os.path.splitext(filename)
 
-                    if file_ext.lower() in MEDIA_FILE_EXTENSIONS:
-                        folder_info["filename_list"].append(file_base_name)
+                        if file_ext.lower() in MEDIA_FILE_EXTENSIONS:
+                            folder_info["filename_list"].append(file_base_name)
 
-                        mp4_file = MP4(file_path)
-                        embedded_video_id = mp4_file.get("\xa9cmt", [None])[0]
+                            mp4_file = MP4(file_path)
+                            embedded_video_id = mp4_file.get("\xa9cmt", [None])[0]
 
-                        folder_info["id_list"].append(embedded_video_id)
+                            folder_info["id_list"].append(embedded_video_id)
 
-                except Exception as e:
-                    self.general_logger.error(
-                        f"No video ID present or cannot read metadata from {filename}: {e}"
-                    )
+                    except Exception as e:
+                        self.general_logger.error(
+                            f"No video ID present or cannot read metadata from {filename}: {e}"
+                        )
 
-    except Exception as e:
-        self.general_logger.error(
-            f"Error getting list of files for channel folder: {e}"
-        )
+        except Exception as e:
+            self.general_logger.error(
+                f"Error getting list of files for channel folder: {e}"
+            )
 
-    finally:
-        self.general_logger.warning(
-            f'Found {len(folder_info["filename_list"])} files and {len(folder_info["id_list"])} IDs in {channel_folder_path}.'
-        )
+        finally:
+            self.general_logger.warning(
+                f'Found {len(folder_info["filename_list"])} files and {len(folder_info["id_list"])} IDs in {channel_folder_path}.'
+            )
 
-    return folder_info
+        return folder_info
 
     def count_media_files(self, channel_folder_path):
         video_item_count = 0
@@ -344,53 +344,53 @@ def get_list_of_files_from_channel_folder(self, channel_folder_path):
 
         return video_item_count + audio_item_count
 
-def cleanup_old_files(self, channel_folder_path, channel):
-    days_to_keep = channel["Keep_Days"]
-    selected_media_type = channel["Media_Type"]
+    def cleanup_old_files(self, channel_folder_path, channel):
+        days_to_keep = channel["Keep_Days"]
+        selected_media_type = channel["Media_Type"]
 
-    if days_to_keep == PERMANENT_RETENTION:
-        self.general_logger.warning(
-            f"Skipping cleanup for channel: {channel['Name']} due to permanent retention policy."
-        )
-        return
+        if days_to_keep == PERMANENT_RETENTION:
+            self.general_logger.warning(
+                f"Skipping cleanup for channel: {channel['Name']} due to permanent retention policy."
+            )
+            return
 
-    current_datetime = datetime.datetime.now()
+        current_datetime = datetime.datetime.now()
 
-    for root, dirs, files in os.walk(channel_folder_path):
-        for filename in files:
-            try:
-                file_path = os.path.join(root, filename)
+        for root, dirs, files in os.walk(channel_folder_path):
+            for filename in files:
+                try:
+                    file_path = os.path.join(root, filename)
 
-                if not os.path.isfile(file_path):
-                    continue
+                    if not os.path.isfile(file_path):
+                        continue
 
-                file_base_name, file_ext = os.path.splitext(filename.lower())
+                    file_base_name, file_ext = os.path.splitext(filename.lower())
 
-                video_file_check = file_ext in VIDEO_EXTENSIONS and selected_media_type == "Video"
-                audio_file_check = file_ext in AUDIO_EXTENSIONS and selected_media_type == "Audio"
-                subtitle_file_check = file_ext == ".srt" and self.subtitles == "external"
+                    video_file_check = file_ext in VIDEO_EXTENSIONS and selected_media_type == "Video"
+                    audio_file_check = file_ext in AUDIO_EXTENSIONS and selected_media_type == "Audio"
+                    subtitle_file_check = file_ext == ".srt" and self.subtitles == "external"
 
-                if not (video_file_check or audio_file_check or subtitle_file_check):
-                    continue
+                    if not (video_file_check or audio_file_check or subtitle_file_check):
+                        continue
 
-                file_mtime = self.get_file_modification_time(file_path, filename, file_ext)
-                age = current_datetime - file_mtime
+                    file_mtime = self.get_file_modification_time(file_path, filename, file_ext)
+                    age = current_datetime - file_mtime
 
-                if age > datetime.timedelta(days=days_to_keep):
-                    os.remove(file_path)
-                    self.general_logger.warning(
-                        f"Deleted: {file_path} as it is {age.days} days old."
+                    if age > datetime.timedelta(days=days_to_keep):
+                        os.remove(file_path)
+                        self.general_logger.warning(
+                            f"Deleted: {file_path} as it is {age.days} days old."
+                        )
+                        self.media_server_scan_req_flag = True
+                    else:
+                        self.general_logger.info(
+                            f"File: {file_path} is {age.days} days old, keeping file."
+                        )
+
+                except Exception as e:
+                    self.general_logger.error(
+                        f"Error Cleaning Old Files: {filename} {str(e)}"
                     )
-                    self.media_server_scan_req_flag = True
-                else:
-                    self.general_logger.info(
-                        f"File: {file_path} is {age.days} days old, keeping file."
-                    )
-
-            except Exception as e:
-                self.general_logger.error(
-                    f"Error Cleaning Old Files: {filename} {str(e)}"
-                )
 
     def get_file_modification_time(self, file_path, filename, file_ext):
         try:
