@@ -324,25 +324,25 @@ def get_list_of_files_from_channel_folder(self, channel_folder_path):
     return folder_info
 
     def count_media_files(self, channel_folder_path):
-    video_item_count = 0
-    audio_item_count = 0
+        video_item_count = 0
+        audio_item_count = 0
 
-    for root, dirs, files in os.walk(channel_folder_path):
-        for filename in files:
-            file_path = os.path.join(root, filename)
+        for root, dirs, files in os.walk(channel_folder_path):
+            for filename in files:
+                file_path = os.path.join(root, filename)
 
-            file_base_name, file_ext = os.path.splitext(filename.lower())
+                file_base_name, file_ext = os.path.splitext(filename.lower())
 
-            if file_ext in VIDEO_EXTENSIONS:
-                video_item_count += 1
-            elif file_ext in AUDIO_EXTENSIONS:
-                audio_item_count += 1
+                if file_ext in VIDEO_EXTENSIONS:
+                    video_item_count += 1
+                elif file_ext in AUDIO_EXTENSIONS:
+                    audio_item_count += 1
 
-    self.general_logger.info(
-        f"Found {video_item_count} video files and {audio_item_count} audio files in {channel_folder_path}."
-    )
+        self.general_logger.info(
+            f"Found {video_item_count} video files and {audio_item_count} audio files in {channel_folder_path}."
+        )
 
-       return video_item_count + audio_item_count
+           return video_item_count + audio_item_count
 
 def cleanup_old_files(self, channel_folder_path, channel):
     days_to_keep = channel["Keep_Days"]
