@@ -95,13 +95,14 @@ HOST_AUDIO_DOWNLOADS=/path/to/audio/folder
 
 ## ✨ Features
 
-✅ Automatic YouTube channel syncing
-✅ Episode numbering (sYYYY.e0001 format)
-✅ Chronological sorting by upload date
-✅ Docker Compose-based deployment
-✅ Configurable storage via .env
-✅ NAS-compatible storage support
-✅ Persistent downloads across restarts
+- ✅ Automatic YouTube channel syncing  
+- ✅ Episode numbering (sYYYY.e0001 format)  
+- ✅ Chronological sorting by upload date  
+- ✅ Docker Compose-based deployment  
+- ✅ Configurable storage via .env  
+- ✅ NAS-compatible storage support  
+- ✅ Persistent downloads across restarts  
+
 
 
 🔧 Notes
