@@ -1,96 +1,103 @@
-![Build Status](https://github.com/TheWicklowWolf/ChannelTube/actions/workflows/main.yml/badge.svg)
-![Docker Pulls](https://img.shields.io/docker/pulls/thewicklowwolf/channeltube.svg)
-
-
-![full_logo](https://raw.githubusercontent.com/TheWicklowWolf/ChannelTube/main/src/static/full_logo.png)
-
+# ChannelTube
 
 ChannelTube is a tool for synchronizing and fetching content from YouTube channels using yt-dlp.
 
+This version includes enhancements such as episode numbering, chronological sorting, Docker Compose deployment, and configurable storage using environment variables.
 
-## Run using docker-compose
+---
+
+## 🚀 Quick Start
+
+```bash
+git clone https://github.com/lomanneh61/ChannelTube.git
+cd ChannelTube
+cp .env.example .env
+nano .env
+docker compose up -d --build
+``
+
+## 🐳 Run using Docker Compose
 
 ```yaml
 services:
   channeltube:
-    image: thewicklowwolf/channeltube:latest
+    build: .
     container_name: channeltube
-    volumes:
-      - /path/to/config:/channeltube/config
-      - /data/media/video:/channeltube/downloads
-      - /data/media/audio:/channeltube/audio_downloads
-      - /etc/localtime:/etc/localtime:ro
+
     ports:
-      - 5000:5000
+      - "5000:5000"
+
+    volumes:
+      - ${HOST_DOWNLOADS}:/channeltube/downloads
+      - ${HOST_CONFIG}:/app/config
+
     restart: unless-stopped
+
+
+## ⚙️ Configuration
+### Create your environment file
+```bash
+cp .env.example .env
+nano .env
+
+
+### Set your paths
+
+```env
+HOST_DOWNLOADS=/path/to/your/download/folder
+
+HOST_CONFIG=/path/to/your/config/folder
+
+
+## ▶️ Run Commands
+
+### Start the application
+
+```bash
+docker compose up -d --build
+
+### Stop the application
+
+```bash
+docker compose down
+
+## 📂 Output Structure
+
+```text
+downloads/
+  Channel Name/
+    Season 2026/
+      s2026.e0001 - Video Title.mp4
+      s2026.e0002 - Video Title.mp4
 ```
+## 🎵 Optional: Audio Downloads
 
-## Configuration via environment variables
+```yaml
+- ${HOST_AUDIO_DOWNLOADS}:/channeltube/audio_downloads
 
-Certain values can be set via environment variables:
+## And define it in your .env file:
 
-* __PUID__: The user ID to run the app with. Defaults to `1000`. 
-* __PGID__: The group ID to run the app with. Defaults to `1000`.
-* __video_format_id__: Specifies the ID for the video format. The default value is `137`.
-* __audio_format_id__: Specifies the ID for the audio format. The default value is `140`.
-* __defer_hours__: Defines the time to defer in hours. The default value is `0`.
-* __thread_limit__: Sets the maximum number of threads to use. The default value is `1`.
-* __fallback_vcodec__: Specifies the fallback video codec to use. Defaults to `vp9`.  
-* __fallback_acodec__ :Specifies the fallback audio codec to use. Defaults to `mp4a`.  
-* __subtitles__: Controls subtitle handling. Options: `none`, `embed`, `external`. Defaults to `none`.
-* __subtitle_languages__: Comma-separated list of subtitle languages to include. Defaults to `en`.
-* __include_id_in_filename__: Include Video ID in filename. Set to `true` or `false`. Defaults to `false`.
-* __verbose_logs__: Enable verbose logging. Set to `true` or `false`. Defaults to `false`.
-* __short_video_cutoff__: Time-based cutoff (in seconds) used to filter short videos. Videos with runtime shorter than this value will be ignored. Defaults to `180`.
-* __auto_update_hour__: Enables automatic nightly update of yt-dlp when set to a value between `0 and 23` (24-hour clock). The update will run once per day during the specified hour. If unset or set to any value outside `0–23`, automatic updates are disabled. Default is `disabled`
-* __ytdlp_update_type__: Update type for yt-dlp. Options: `stable` (default) or `nightly` (uses pre-release builds).
-
-> For information on format IDs, refer to [https://github.com/yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp)
-> 
-> ![yt-dlp-formats](https://github.com/user-attachments/assets/e03b9dd3-028f-4c72-b822-06aa1d440cea)
+```env
+HOST_AUDIO_DOWNLOADS=/path/to/audio/folder
 
 
-## Sync Schedule
+## ✨ Features
 
-Use a comma-separated list of hours to search for new items (e.g. `2, 20` will initiate a search at 2 AM and 8 PM).
-> Note: There is a deadband of up to 10 minutes from the scheduled start time.
-
-## Media Server Integration (optional)
-
-A media server library scan can be triggered when new content is retrieved.
-
-For Plex, use: `Plex: http://192.168.1.2:32400`  
-For Jellyfin, use: `Jellyfin: http://192.168.1.2:8096`  
-To use both, enter: `Plex: http://192.168.1.2:32400, Jellyfin: http://192.168.1.2:8096`  
-The same format applies for the tokens.  
-
-The **Media Server Library Name** refers to the name of the library where the videos are stored.  
-
-To disable this feature:
-- Leave **Media Server Addresses**, **Media Server Tokens** and **Media Server Library Name** blank.  
-
-## Cookies (optional)
-To utilize a cookies file with yt-dlp, follow these steps:
-
-* Generate Cookies File: Open your web browser and use a suitable extension (e.g. cookies.txt for Firefox) to extract cookies for a user on YT.
-
-* Save Cookies File: Save the obtained cookies into a file named `cookies.txt` and put it into the config folder.
+✅ Automatic YouTube channel syncing
+✅ Episode numbering (sYYYY.e0001 format)
+✅ Chronological sorting by upload date
+✅ Docker Compose-based deployment
+✅ Configurable storage via .env
+✅ NAS-compatible storage support
+✅ Persistent downloads across restarts
 
 
----
+🔧 Notes
 
-![light](https://raw.githubusercontent.com/TheWicklowWolf/ChannelTube/main/src/static/light.png)
-
-
----
-
-
-![dark](https://raw.githubusercontent.com/TheWicklowWolf/ChannelTube/main/src/static/dark.png)
-
----
+Plex/Jellyfin integration depends on correct server IP configuration.
+Ensure your download paths have the proper permissions (e.g., PUID=1000).
+.env is not tracked in Git — use .env.example as a template.
 
 
-https://hub.docker.com/r/thewicklowwolf/channeltube
-
-
-
+📜 License
+See the LICENSE file for details.
