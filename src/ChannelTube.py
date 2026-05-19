@@ -485,8 +485,16 @@ class DataHandler:
                    # ✅ network fixes
                    "retries": 10,
                    "fragment_retries": 10,
-                    "socket_timeout": 60,
-                    "concurrent_fragment_downloads": 1,
+                   "socket_timeout": 60,
+                   "concurrent_fragment_downloads": 1,
+
+                  
+                   "js_runtimes": {
+                       "deno": {
+                           "path": "/usr/local/bin/deno"
+                       }
+                   },
+ 
 
                    # ✅ merged extractor args (FIXED)
                    "extractor_args": {
