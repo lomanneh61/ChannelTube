@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  channeltube:
+    build: .
+    container_name: channeltube
+    ports:
+      - "5000:5000"
+    volumes:
+      - ${HOST_DOWNLOADS}:/channeltube/downloads
+      - ${HOST_CONFIG}:/app/config
+    restart: unless-stopped

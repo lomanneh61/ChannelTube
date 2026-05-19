@@ -3,7 +3,6 @@ import re
 import os
 import json
 import time
-import datetime
 import threading
 from mutagen.mp4 import MP4
 import concurrent.futures
@@ -13,6 +12,7 @@ import yt_dlp
 from plexapi.server import PlexServer
 import requests
 import tempfile
+from datetime import datetime, timedelta
 
 PERMANENT_RETENTION = -1
 VIDEO_EXTENSIONS = {".mp4"}
@@ -146,15 +146,15 @@ class DataHandler:
         self.general_logger.warning("Starting periodic checks every 10 minutes to monitor sync start times.")
         self.general_logger.warning(f"Current scheduled hours to start sync (in 24-hour format): {self.sync_start_times}")
         while True:
-            current_time = datetime.datetime.now()
+            current_time = datetime.now()
             within_sync_window = current_time.hour in self.sync_start_times
 
             if within_sync_window:
                 self.general_logger.warning(f"Time to Start Sync - as current hour: {current_time.hour} in schedule {str(self.sync_start_times)}")
                 self.master_queue()
 
-                current_time = datetime.datetime.now()
-                next_hour = (current_time + datetime.timedelta(hours=1)).replace(minute=0, second=0, microsecond=1)
+                current_time = datetime
+                next_hour = (current_time + timedelta(hours=1)).replace(minute=0, second=0, microsecond=1)
                 sleep_seconds = (next_hour - current_time).total_seconds()
 
                 self.general_logger.warning(f"Sync Complete - Sleeping for {int(sleep_seconds)} seconds until {next_hour.time()}")
@@ -210,8 +210,8 @@ class DataHandler:
 
             playlist = ydl.extract_info(playlist_url, download=False)
 
-        today = datetime.datetime.now()
-        cutoff_date = today - datetime.timedelta(days=days_to_retrieve)
+        today = datetime.now()
+        cutoff_date = today - timedelta(days=days_to_retrieve)
 
         for video in playlist["entries"]:
             try:
@@ -252,7 +252,7 @@ class DataHandler:
                 video_extracted_info = ydl.extract_info(video_link, download=False)
 
                 video_upload_date_raw = video_extracted_info["upload_date"]
-                video_upload_date = datetime.datetime.strptime(video_upload_date_raw, "%Y%m%d")
+                video_upload_date = datetime.strptime(video_upload_date_raw, "%Y%m%d")
                 video_timestamp = video_extracted_info["timestamp"]
 
                 current_time = time.time()
@@ -354,7 +354,7 @@ class DataHandler:
             )
             return
 
-        current_datetime = datetime.datetime.now()
+        current_datetime = datetime.now()
 
         for root, dirs, files in os.walk(channel_folder_path):
             for filename in files:
@@ -376,7 +376,7 @@ class DataHandler:
                     file_mtime = self.get_file_modification_time(file_path, filename, file_ext)
                     age = current_datetime - file_mtime
 
-                    if age > datetime.timedelta(days=days_to_keep):
+                    if age > timedelta(days=days_to_keep):
                         os.remove(file_path)
                         self.general_logger.warning(
                             f"Deleted: {file_path} as it is {age.days} days old."
@@ -395,13 +395,13 @@ class DataHandler:
     def get_file_modification_time(self, file_path, filename, file_ext):
         try:
             if file_ext == ".srt":
-                file_mtime = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+                file_mtime = datetime.fromtimestamp(os.path.getmtime(file_path))
                 return file_mtime
 
             mpeg4_file = MP4(file_path)
             mpeg4_file_created_timestamp = mpeg4_file.get("\xa9day", [None])[0]
             if mpeg4_file_created_timestamp:
-                file_mtime = datetime.datetime.strptime(mpeg4_file_created_timestamp, "%Y-%m-%d %H:%M:%S")
+                file_mtime = datetime.strptime(mpeg4_file_created_timestamp, "%Y-%m-%d %H:%M:%S")
                 self.general_logger.warning(f"Extracted datetime {file_mtime} from metadata of {filename}")
                 return file_mtime
             else:
@@ -409,11 +409,15 @@ class DataHandler:
 
         except Exception as e:
             self.general_logger.warning(f"Error extracting datetime from metadata for {filename}: {e}")
-            file_mtime = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+            file_mtime = datetime.fromtimestamp(os.path.getmtime(file_path))
             self.general_logger.warning(f"Using filesystem modified timestamp {file_mtime} for {filename}")
             return file_mtime
 
     def download_items(self, item_list, channel_folder_path, channel):
+        
+        # Sort videos by upload date (oldest first)
+        item_list.sort(key=lambda x: x.get("upload_date", datetime.min))
+
         episode_counter_cache = {}
         for item in item_list:
             self.general_logger.warning(f'Starting download: {item["title"]}')
@@ -584,7 +588,7 @@ class DataHandler:
 
     def add_extra_metadata(self, file_path, item):
         try:
-            current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             m4_file = MP4(file_path)
             m4_file["\xa9day"] = current_datetime
             m4_file["\xa9cmt"] = item["id"]
@@ -659,7 +663,7 @@ class DataHandler:
             channel["Item_Count"] = self.count_media_files(channel_folder_path)
             self.general_logger.warning(f'Finished Counting Files for channel: {channel["Name"]}')
 
-            channel["Last_Synced"] = datetime.datetime.now().strftime("%d-%m-%y %H:%M:%S")
+            channel["Last_Synced"] = datetime.now().strftime("%d-%m-%y %H:%M:%S")
             self.general_logger.warning(f'Completed processing for channel: {channel["Name"]}')
 
         except Exception as e:
