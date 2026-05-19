@@ -414,6 +414,7 @@ class DataHandler:
             return file_mtime
 
     def download_items(self, item_list, channel_folder_path, channel):
+        episode_counter_cache = {}
         for item in item_list:
             self.general_logger.warning(f'Starting download: {item["title"]}')
 
@@ -467,9 +468,16 @@ class DataHandler:
                 os.makedirs(season_path, exist_ok=True)
 
                 safe_title = self.string_cleaner(item["title"])
-                video_id = item["id"]
+            
 
-                filename = f"s{year}.e{video_id} - {safe_title}"
+                if season_path not in episode_counter_cache:
+                    episode_counter_cache[season_path] = self.get_next_episode_number(season_path)
+
+                episode_number = episode_counter_cache[season_path]
+                episode_counter_cache[season_path] += 1
+
+                filename = f"s{year}.e{episode_number:04d} - {safe_title}"
+
 
                 
                 ydl_opts = {
@@ -789,6 +797,30 @@ class DataHandler:
         task_thread = threading.Thread(target=self.master_queue, daemon=True)
         task_thread.start()
         socketio.emit("settings_save_message", "Manual sync initiated.")
+
+        
+# ✅ ADD IT HERE (inside the class)
+    def get_next_episode_number(self, season_path):
+        import os
+        import re
+
+        if not os.path.exists(season_path):
+            return 1
+
+        episode_numbers = []
+
+        for root, dirs, files in os.walk(season_path):
+            for file in files:
+                if file.endswith(".mp4"):
+                    match = re.search(r"\.e(\d+)", file)
+                    if match:
+                        episode_numbers.append(int(match.group(1)))
+
+        if not episode_numbers:
+            return 1
+
+        return max(episode_numbers) + 1
+
 
 
 app = Flask(__name__)
