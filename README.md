@@ -14,7 +14,7 @@ cd ChannelTube
 cp .env.example .env
 nano .env
 docker compose up -d --build
-``
+```
 
 
 ## 🐳 Run using Docker Compose
