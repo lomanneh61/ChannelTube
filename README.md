@@ -4,7 +4,7 @@ ChannelTube is a tool for synchronizing and fetching content from YouTube channe
 
 This version includes enhancements such as episode numbering, chronological sorting, Docker Compose deployment, and configurable storage using environment variables.
 
----
+
 
 ## 🚀 Quick Start
 
@@ -15,6 +15,7 @@ cp .env.example .env
 nano .env
 docker compose up -d --build
 ``
+
 
 ## 🐳 Run using Docker Compose
 
@@ -35,6 +36,7 @@ services:
 
 
 ## ⚙️ Configuration
+
 ### Create your environment file
 ```bash
 cp .env.example .env
@@ -73,11 +75,13 @@ downloads/
 ## 🎵 Optional: Audio Downloads
 
 ```yaml
+
 - ${HOST_AUDIO_DOWNLOADS}:/channeltube/audio_downloads
 
 ## And define it in your .env file:
 
 ```env
+
 HOST_AUDIO_DOWNLOADS=/path/to/audio/folder
 
 
