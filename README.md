@@ -112,5 +112,8 @@ Ensure your download paths have the proper permissions (e.g., PUID=1000).
 .env is not tracked in Git — use .env.example as a template.
 
 
-📜 License
-See the LICENSE file for details.
+
+## 📜 License
+
+This project is licensed under the terms of the GNU General Public License v3.0 (GPL-3.0).  
+See the LICENSE file for full details.
