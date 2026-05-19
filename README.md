@@ -33,14 +33,16 @@ services:
       - ${HOST_CONFIG}:/app/config
 
     restart: unless-stopped
-
+ ```   
 
 ## ⚙️ Configuration
 
 ### Create your environment file
+
 ```bash
 cp .env.example .env
 nano .env
+```
 
 
 ### Set your paths
@@ -49,6 +51,7 @@ nano .env
 HOST_DOWNLOADS=/path/to/your/download/folder
 
 HOST_CONFIG=/path/to/your/config/folder
+```
 
 
 ## ▶️ Run Commands
@@ -57,15 +60,18 @@ HOST_CONFIG=/path/to/your/config/folder
 
 ```bash
 docker compose up -d --build
+```
 
 ### Stop the application
 
 ```bash
 docker compose down
+```
 
 ## 📂 Output Structure
 
 ```text
+
 downloads/
   Channel Name/
     Season 2026/
@@ -77,12 +83,14 @@ downloads/
 ```yaml
 
 - ${HOST_AUDIO_DOWNLOADS}:/channeltube/audio_downloads
+```
 
 ## And define it in your .env file:
 
 ```env
 
 HOST_AUDIO_DOWNLOADS=/path/to/audio/folder
+```
 
 
 ## ✨ Features
