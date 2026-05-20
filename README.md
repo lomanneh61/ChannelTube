@@ -12,9 +12,15 @@ This version includes enhancements such as episode numbering, chronological sort
 git clone https://github.com/lomanneh61/ChannelTube.git
 cd ChannelTube
 cp .env.example .env
-nano .env
-docker compose up -d --build
 ```
+Edit your .env file:
+
+nano .env
+
+Then start the application:
+
+docker compose up -d --build
+
 
 
 ## 🐳 Run using Docker Compose
