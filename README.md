@@ -80,6 +80,8 @@ downloads/
 ```
 ## 🎵 Optional: Audio Downloads
 
+If enabled, audio-only downloads will be saved to a separate folder.
+
 ```yaml
 
 - ${HOST_AUDIO_DOWNLOADS}:/channeltube/audio_downloads
